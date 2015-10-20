@@ -160,10 +160,17 @@ void Tracking::SetKeyFrameDatabase(KeyFrameDatabase *pKFDB)
 void Tracking::Run()
 {
     ros::NodeHandle nodeHandler;
-    ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &Tracking::GrabImage, this);
+    ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 55, &Tracking::GrabImage, this);
 
     ros::spin();
 }
+/*
+void Tracking::CachImage(cont sensor_msgs::ImageConstPtr & msg)
+{
+    boost::mutex::scoped_lock lock(mMutexImageCacheAccess);
+    mImageCache.push_back(msg);
+}
+*/
 
 void Tracking::GrabImage(const sensor_msgs::ImageConstPtr& msg)
 {
