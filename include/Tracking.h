@@ -25,6 +25,7 @@
 #include<opencv2/features2d/features2d.hpp>
 #include<sensor_msgs/Image.h>
 #include<sensor_msgs/image_encodings.h>
+#include<std_msgs/String.h>
 
 #include"FramePublisher.h"
 #include"Map.h"
@@ -36,6 +37,7 @@
 #include"ORBextractor.h"
 #include "Initializer.h"
 #include "MapPublisher.h"
+#include "FrameTrace.h"
 
 #include<tf/transform_broadcaster.h>
 
@@ -182,8 +184,7 @@ protected:
     // Transfor broadcaster (for visualization in rviz)
     tf::TransformBroadcaster mTfBr;
 
-    //std::deque<const sensor_msgs::ImageConstPtr> mImageCache;
-    //boost::mutex mMutexImageCacheAccess;
+    void ReceiveCommands(const std_msgs::StringConstPtr & msg);
 };
 
 } //namespace ORB_SLAM

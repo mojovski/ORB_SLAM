@@ -45,7 +45,7 @@ class Frame
 public:
     Frame();
     Frame(const Frame &frame);
-    Frame(cv::Mat &im, const double &timeStamp, ORBextractor* extractor, ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef);
+    Frame(cv::Mat &im, const double &timeStamp, std::string ros_id, ORBextractor* extractor, ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef);
 
     ORBVocabulary* mpORBvocabulary;
     ORBextractor* mpORBextractor;
@@ -125,6 +125,9 @@ public:
 
     static bool mbInitialComputations;
 
+    //!Returns the ID seen in the ROS header
+    std::string getROSID(){return mROSID;}
+
 
 private:
 
@@ -135,6 +138,7 @@ private:
     cv::Mat mOw;
     cv::Mat mRcw;
     cv::Mat mtcw;
+    std::string mROSID; //The ID inside the ROS Package header. http://docs.ros.org/api/std_msgs/html/msg/Header.html
 };
 
 }// namespace ORB_SLAM

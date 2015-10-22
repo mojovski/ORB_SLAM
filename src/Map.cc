@@ -135,4 +135,9 @@ void Map::clear()
     mvpReferenceMapPoints.clear();
 }
 
+void Map::AddFrameTrace(FrameTrace* ft)
+{
+    mFrameTraces.push_back(ft);
+}
+
 } //namespace ORB_SLAM

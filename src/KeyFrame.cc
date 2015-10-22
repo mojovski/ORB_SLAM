@@ -36,7 +36,8 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
     mvpMapPoints(F.mvpMapPoints), mpKeyFrameDB(pKFDB), mpORBvocabulary(F.mpORBvocabulary), mFeatVec(F.mFeatVec),
     mbFirstConnection(true), mpParent(NULL), mbNotErase(false), mbToBeErased(false), mbBad(false),
     mnScaleLevels(F.mnScaleLevels), mvScaleFactors(F.mvScaleFactors), mvLevelSigma2(F.mvLevelSigma2),
-    mvInvLevelSigma2(F.mvInvLevelSigma2), mpMap(pMap)
+    mvInvLevelSigma2(F.mvInvLevelSigma2), mpMap(pMap),
+    mFrameROSID(F.getROSID())
 {
     mnId=nNextId++;
 
@@ -686,6 +687,11 @@ float KeyFrame::ComputeSceneMedianDepth(int q)
     sort(vDepths.begin(),vDepths.end());
 
     return vDepths[(vDepths.size()-1)/q];
+}
+
+std::string KeyFrame::getFrameROSID()
+{
+    return mFrameROSID;
 }
 
 } //namespace ORB_SLAM

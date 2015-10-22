@@ -23,6 +23,7 @@
 
 #include "MapPoint.h"
 #include "KeyFrame.h"
+#include "FrameTrace.h"
 #include<set>
 
 #include<boost/thread.hpp>
@@ -65,6 +66,8 @@ public:
 
     void clear();
 
+    void AddFrameTrace(FrameTrace* ft);
+
 protected:
     std::set<MapPoint*> mspMapPoints;
     std::set<KeyFrame*> mspKeyFrames;
@@ -75,6 +78,8 @@ protected:
 
     boost::mutex mMutexMap;
     bool mbMapUpdated;
+
+    std::vector<FrameTrace*> mFrameTraces;
 };
 
 } //namespace ORB_SLAM

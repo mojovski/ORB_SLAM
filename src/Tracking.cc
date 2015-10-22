@@ -161,16 +161,16 @@ void Tracking::Run()
 {
     ros::NodeHandle nodeHandler;
     ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 55, &Tracking::GrabImage, this);
+    ros::Subscriber sub2 = nodeHandler.subscribe("/ORB_SLAM/COMMANDS", 1, &Tracking::ReceiveCommands, this);
 
     ros::spin();
 }
-/*
-void Tracking::CachImage(cont sensor_msgs::ImageConstPtr & msg)
+
+void Tracking::ReceiveCommands(const std_msgs::StringConstPtr & msg)
 {
-    boost::mutex::scoped_lock lock(mMutexImageCacheAccess);
-    mImageCache.push_back(msg);
+    ROS_INFO("Received command [%s]", msg->data.c_str());
 }
-*/
+
 
 void Tracking::GrabImage(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -204,9 +204,9 @@ void Tracking::GrabImage(const sensor_msgs::ImageConstPtr& msg)
     }
 
     if(mState==WORKING || mState==LOST)
-        mCurrentFrame = Frame(im,cv_ptr->header.stamp.toSec(),mpORBextractor,mpORBVocabulary,mK,mDistCoef);
+        mCurrentFrame = Frame(im,cv_ptr->header.stamp.toSec(), cv_ptr->header.frame_id, mpORBextractor,mpORBVocabulary,mK,mDistCoef);
     else
-        mCurrentFrame = Frame(im,cv_ptr->header.stamp.toSec(),mpIniORBextractor,mpORBVocabulary,mK,mDistCoef);
+        mCurrentFrame = Frame(im,cv_ptr->header.stamp.toSec(), cv_ptr->header.frame_id, mpIniORBextractor,mpORBVocabulary,mK,mDistCoef);
 
     // Depending on the state of the Tracker we perform different tasks
 
@@ -256,8 +256,22 @@ void Tracking::GrabImage(const sensor_msgs::ImageConstPtr& msg)
         {
             mpMapPublisher->SetCurrentCameraPose(mCurrentFrame.mTcw);
 
+            //create a FrameTrace to store relevant data for later export
+            FrameTrace * frame_trace=new FrameTrace(mCurrentFrame);
+            mpMap->AddFrameTrace(frame_trace);
+
             if(NeedNewKeyFrame())
+            {
                 CreateNewKeyFrame();
+                frame_trace->ResetRelativeKfPose();
+                frame_trace->mpReferenceKF=mpLastKeyFrame;
+            }
+            
+            /*else 
+            {
+                TODO: Store the mCurrentFrame as a child of the currentKeyFrame.
+                makes this sense??
+            }*/
 
             // We allow points with high innovation (considererd outliers by the Huber Function)
             // pass to the new keyframe, so that bundle adjustment will finally decide

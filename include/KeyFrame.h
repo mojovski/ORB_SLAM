@@ -178,6 +178,9 @@ public:
         return pKF1->mnId<pKF2->mnId;
     }
 
+    //! brief returns the ID seen in the ROS Header
+    std::string getFrameROSID();
+
 
 protected:
 
@@ -235,6 +238,9 @@ protected:
     boost::mutex mMutexConnections;
     boost::mutex mMutexFeatures;
     boost::mutex mMutexImage;
+
+    //Identification from the ros message
+    std::string mFrameROSID;
 };
 
 } //namespace ORB_SLAM
