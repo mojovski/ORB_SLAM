@@ -115,6 +115,9 @@ protected:
     bool NeedNewKeyFrame();
     void CreateNewKeyFrame();
 
+    /** @brief Exports the scene to an NVM file **/
+    void ExportNVM(std::string& filepath);
+
 
     //Other Thread Pointers
     LocalMapping* mpLocalMapper;
