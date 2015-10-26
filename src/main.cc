@@ -184,6 +184,73 @@ int main(int argc, char **argv)
     }
     f.close();
 
+    //--------------
+    //  Export the Poses and the Features to a NVM file
+    //--------------
+    cout << endl << "Saving NVM to ORB_SLAM.nvm" << endl;
+    //See http://ccwu.me/vsfm/doc.html#nvm for details about the file structure
+    string nvmStrFile = ros::package::getPath("ORB_SLAM")+"/"+"ORB_SLAM.nvm";
+    f.open(nvmStrFile.c_str());
+    // fx cx fy cy;
+    f << "NVM_V3 "+fsSettings["Camera.fx"]+" "+fsSettings["Camera.fx"]+" "+fsSettings["Camera.fy"]+" "+fsSettings["Camera.cy"]
+
+    //Now: the model: 
+    //<Number of cameras>   <List of cameras>
+    //<Number of 3D points> <List of points>
+    /*
+        <Camera> = <Image File name> <focal length> <quaternion WXYZ> <camera center> <radial distortion> 0
+        <Point>  = <XYZ> <RGB> <number of measurements> <List of Measurements>
+        <Measurement> = <Image index> <Feature Index> <xy>
+    */
+
+    //------ Exort the cameras
+    int count_good_KF=0;
+    for(size_t i=0; i<vpKFs.size(); i++)
+    {
+        ORB_SLAM::KeyFrame* pKF = vpKFs[i];
+
+        if(pKF->isBad())
+            continue;
+        count_good_KF+=1;
+    }
+    f << count_good_KF << " "; //now, the list of cameras follows
+
+    for(size_t i=0; i<vpKFs.size(); i++)
+    {
+        ORB_SLAM::KeyFrame* pKF = vpKFs[i];
+
+        if(pKF->isBad())
+            continue;
+        f << "img"<< i << ".jpg " << fsSettings["Camera.fx"] << " " << fsSettings["Camera.fy"] << 
+
+        cv::Mat R = pKF->GetRotation().t();
+        vector<float> q = ORB_SLAM::Converter::toQuaternion(R);
+        cv::Mat t = pKF->GetCameraCenter();
+        f << "img"<< i << ".jpg " << fsSettings["Camera.fx"] << " " << fsSettings["Camera.fy"] << 
+            q[0] << " " << q[1] << " " << q[2] << " " << q[3] <<
+            t.at<float>(0) << " " << t.at<float>(1) << " " << t.at<float>(2) <<
+            fsSettings["Camera.k1"] << " " << fsSettings["Camera.k2"];
+    }
+    f<< "\n";
+
+    //----------export the 3d points
+    std::vector<MapPoint*> all_points=World.GetAllMapPoints();
+    for(size_t i=0, iend=all_points.size(); i<iend;i++)
+    {
+        MapPoint* pMP = all_points[i];
+        cv::Mat pos=pMP->GetWorldPos();
+        TODO: access elemnts inthe matrix
+        f << pos.at<float>[0]
+        g2o::VertexSBAPointXYZ* vPoint = static_cast<g2o::VertexSBAPointXYZ*>(optimizer.vertex(pMP->mnId+maxKFid+1));
+        pMP->SetWorldPos(Converter::toCvMat(vPoint->estimate()));
+        pMP->UpdateNormalAndDepth();
+    }
+
+
+
+
+
+
     ros::shutdown();
 
 	return 0;
