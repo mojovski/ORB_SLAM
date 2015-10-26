@@ -177,14 +177,6 @@ void Tracking::ExportNVM(std::string& filepath)
     //todo
 }
 
-void Tracking::RememberCurrentFrameInKeyFrame()
-{
-    KeyFrame* pKF = new KeyFrame(mCurrentFrame,mpMap,mpKeyFrameDB);
-
-    mpLastKeyFrame->addChild(pKF);
-    Question:: If I change the rotation of the parent keyframe by BA, does the rotation of child-KF also change???
-
-}
 
 void Tracking::GrabImage(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -268,7 +260,6 @@ void Tracking::GrabImage(const sensor_msgs::ImageConstPtr& msg)
         // If tracking were good, check if we insert a keyframe
         if(bOK)
         {
-            RememberCurrentFrameInKeyFrame();
             mpMapPublisher->SetCurrentCameraPose(mCurrentFrame.mTcw);
 
             if(NeedNewKeyFrame())
