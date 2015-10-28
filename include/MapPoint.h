@@ -47,6 +47,7 @@ public:
     cv::Mat GetNormal();
     KeyFrame* GetReferenceKeyFrame();
 
+    //refers to a key frame and the index of the observation in it.
     std::map<KeyFrame*,size_t> GetObservations();
     int Observations();
 
