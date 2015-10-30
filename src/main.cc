@@ -226,6 +226,8 @@ int main(int argc, char **argv)
     f << count_good_KF << "\n"; //now, the list of cameras follows
 
     //1.2 export the camera parameters itself 
+    //indexing of key frames by its consecutive number
+    std::map<int,int> kf_index;
     for(size_t i=0; i<vpKFs.size(); i++)
     {
         ORB_SLAM::KeyFrame* pKF = vpKFs[i];
@@ -236,7 +238,8 @@ int main(int argc, char **argv)
         cv::Mat R = pKF->GetRotation().t();
         vector<float> q = ORB_SLAM::Converter::toQuaternion(R);
         cv::Mat t = pKF->GetCameraCenter();
-        f << "img_"<<  formatInt(pKF->mnId, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
+        kf_index[pKF->mnId]=i;
+        f << "frame"<<  formatInt(pKF->mnId, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
             q[3] << " " <<  q[0] << " " << q[1] << " " << q[2] << " " << //WXYZ
             t.at<float>(0) << " " << t.at<float>(1) << " " << t.at<float>(2) << " " << 
             (double)fsSettings["Camera.k1"] << " " << (double)fsSettings["Camera.k2"] << " 0\n";
@@ -259,9 +262,12 @@ int main(int argc, char **argv)
         f << pMP->Observations() << " ";
         for (std::map<KeyFrame*,size_t>::iterator ob_it=observations.begin(); ob_it!=observations.end(); ob_it++)
         {
+            //skip if the key frame is "bad"
+            if ((*ob_it).first->isBad())
+                continue;
             //<Measurement> = <Image index> <Feature Index> <xy>
             std::vector<cv::KeyPoint> key_points=(*ob_it).first->GetKeyPoints();
-            f << ",mnID:" << (*ob_it).first->mnId << " " << (*ob_it).second << " " << 
+            f << kf_index[(*ob_it).first->mnId] << " " << (*ob_it).second << " " << 
             key_points[ob_it->second].pt.x << " " <<
             key_points[ob_it->second].pt.y;
         }
