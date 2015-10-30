@@ -199,8 +199,8 @@ int main(int argc, char **argv)
     string nvmStrFile = ros::package::getPath("ORB_SLAM")+"/"+"ORB_SLAM.nvm";
     f.open(nvmStrFile.c_str());
     // fx cx fy cy;
-    f << "NVM_V3 " << (double)fsSettings["Camera.fx"] << " " << (double)fsSettings["Camera.fx"] << " " << 
-        (double)fsSettings["Camera.fy"] << " " << (double)fsSettings["Camera.cy"] << "\n";
+    f << "NVM_V3 " << (double)fsSettings["Camera.fx"] << " " << (double)fsSettings["Camera.fy"] << " " << 
+        (double)fsSettings["Camera.cx"] << " " << (double)fsSettings["Camera.cy"] << "\n";
 
     //Now: the model: 
     //<Number of cameras>   <List of cameras>
@@ -236,9 +236,9 @@ int main(int argc, char **argv)
         cv::Mat R = pKF->GetRotation().t();
         vector<float> q = ORB_SLAM::Converter::toQuaternion(R);
         cv::Mat t = pKF->GetCameraCenter();
-        f << "img_"<< formatInt(i, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
-            q[0] << " " << q[1] << " " << q[2] << " " << q[3] <<
-            t.at<float>(0) << " " << t.at<float>(1) << " " << t.at<float>(2) <<
+        f << "img_"<< formatInt(i, 4) << "_mnID" << formatInt(pKF->mnId, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
+            q[3] << " " <<  q[0] << " " << q[1] << " " << q[2] << " " << //WXYZ
+            t.at<float>(0) << " " << t.at<float>(1) << " " << t.at<float>(2) << " " << 
             (double)fsSettings["Camera.k1"] << " " << (double)fsSettings["Camera.k2"] << " 0\n";
     }
     f<< "\n";
@@ -261,7 +261,7 @@ int main(int argc, char **argv)
         {
             //<Measurement> = <Image index> <Feature Index> <xy>
             std::vector<cv::KeyPoint> key_points=(*ob_it).first->GetKeyPoints();
-            f << (*ob_it).first->mnId << " " << (*ob_it).second << " " << 
+            f << ",mnID:" << (*ob_it).first->mnId << " " << (*ob_it).second << " " << 
             key_points[ob_it->second].pt.x << " " <<
             key_points[ob_it->second].pt.y;
         }
