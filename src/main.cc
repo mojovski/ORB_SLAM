@@ -236,7 +236,7 @@ int main(int argc, char **argv)
         cv::Mat R = pKF->GetRotation().t();
         vector<float> q = ORB_SLAM::Converter::toQuaternion(R);
         cv::Mat t = pKF->GetCameraCenter();
-        f << "img_"<< formatInt(i, 4) << "_mnID" << formatInt(pKF->mnId, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
+        f << "img_"<<  formatInt(pKF->mnId, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
             q[3] << " " <<  q[0] << " " << q[1] << " " << q[2] << " " << //WXYZ
             t.at<float>(0) << " " << t.at<float>(1) << " " << t.at<float>(2) << " " << 
             (double)fsSettings["Camera.k1"] << " " << (double)fsSettings["Camera.k2"] << " 0\n";
