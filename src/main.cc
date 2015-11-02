@@ -238,8 +238,8 @@ int main(int argc, char **argv)
         cv::Mat R = pKF->GetRotation().t();
         vector<float> q = ORB_SLAM::Converter::toQuaternion(R);
         cv::Mat t = pKF->GetCameraCenter();
-        kf_index[pKF->mnId]=i;
-        f << "frame"<<  formatInt(pKF->mnId, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
+        kf_index[pKF->mnFrameId]=i;
+        f << "frame"<<  formatInt(pKF->mnFrameId, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
             q[3] << " " <<  q[0] << " " << q[1] << " " << q[2] << " " << //WXYZ
             t.at<float>(0) << " " << t.at<float>(1) << " " << t.at<float>(2) << " " << 
             (double)fsSettings["Camera.k1"] << " " << (double)fsSettings["Camera.k2"] << " 0\n";
@@ -267,7 +267,7 @@ int main(int argc, char **argv)
                 continue;
             //<Measurement> = <Image index> <Feature Index> <xy>
             std::vector<cv::KeyPoint> key_points=(*ob_it).first->GetKeyPoints();
-            f << kf_index[(*ob_it).first->mnId] << " " << (*ob_it).second << " " << 
+            f << kf_index[(*ob_it).first->mnFrameId] << " " << (*ob_it).second << " " << 
             key_points[ob_it->second].pt.x << " " <<
             key_points[ob_it->second].pt.y;
         }
