@@ -199,7 +199,7 @@ int main(int argc, char **argv)
     string nvmStrFile = ros::package::getPath("ORB_SLAM")+"/"+"ORB_SLAM.nvm";
     f.open(nvmStrFile.c_str());
     // fx cx fy cy;
-    f << "NVM_V3 " << (double)fsSettings["Camera.fx"] << " " << (double)fsSettings["Camera.fy"] << " " << 
+    f << "NVM_V3_KFIXED " << (double)fsSettings["Camera.fx"] << " " << (double)fsSettings["Camera.fy"] << " " << 
         (double)fsSettings["Camera.cx"] << " " << (double)fsSettings["Camera.cy"] << "\n";
 
     //Now: the model: 
@@ -242,9 +242,9 @@ int main(int argc, char **argv)
         f << "frame"<<  formatInt(pKF->mnFrameId, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
             q[3] << " " <<  q[0] << " " << q[1] << " " << q[2] << " " << //WXYZ
             t.at<float>(0) << " " << t.at<float>(1) << " " << t.at<float>(2) << " " << 
-            (double)fsSettings["Camera.k1"] << " " << (double)fsSettings["Camera.k2"] << " 0\n";
+            (double)fsSettings["Camera.k1"] << " " << (double)fsSettings["Camera.k2"] << "\n";
     }
-    f<< "\n";
+    //f<< "\n";
     using namespace ORB_SLAM;
     //2. Export the 3D feature observations
     std::vector<MapPoint*> all_points=World.GetAllMapPoints();
@@ -269,7 +269,7 @@ int main(int argc, char **argv)
             std::vector<cv::KeyPoint> key_points=(*ob_it).first->GetKeyPoints();
             f << kf_index[(*ob_it).first->mnFrameId] << " " << (*ob_it).second << " " << 
             key_points[ob_it->second].pt.x << " " <<
-            key_points[ob_it->second].pt.y;
+            key_points[ob_it->second].pt.y << " ";
         }
         f << "\n";
 
