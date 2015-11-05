@@ -203,8 +203,10 @@ int main(int argc, char **argv)
     string nvmStrFile = ros::package::getPath("ORB_SLAM")+"/"+"ORB_SLAM.nvm";
     f.open(nvmStrFile.c_str());
     // fx cx fy cy;
-    f << "NVM_V3_KFIXED " << (double)fsSettings["Camera.fx"] << " " << (double)fsSettings["Camera.fy"] << " " << 
-        (double)fsSettings["Camera.cx"] << " " << (double)fsSettings["Camera.cy"] << "\n";
+    f << "NVM_V3 \n"; 
+    //used for fixed cameras, but not supported yet by vsfm
+    //"_KFIXED " << (double)fsSettings["Camera.fx"] << " " << (double)fsSettings["Camera.fy"] << " " << 
+    //    (double)fsSettings["Camera.cx"] << " " << (double)fsSettings["Camera.cy"] << "\n";
 
     //Now: the model: 
     //<Number of cameras>   <List of cameras>
