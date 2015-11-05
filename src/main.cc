@@ -234,17 +234,19 @@ int main(int argc, char **argv)
     //1.2 export the camera parameters itself 
     //indexing of key frames by its consecutive number
     std::map<int,int> kf_index;
+    int inc_frame_counter=-1;
     for(size_t i=0; i<vpKFs.size(); i++)
     {
         ORB_SLAM::KeyFrame* pKF = vpKFs[i];
 
         if(pKF->isBad())
             continue;
+        inc_frame_counter+=1;
 
         cv::Mat R = pKF->GetRotation();//.t();
         vector<float> q = ORB_SLAM::Converter::toQuaternion(R);
         cv::Mat t = pKF->GetCameraCenter();
-        kf_index[pKF->mnFrameId]=i;
+        kf_index[pKF->mnFrameId]=inc_frame_counter;
         f << "frame"<<  formatInt(pKF->mnFrameId, 4) << ".jpg " << (double)fsSettings["Camera.fx"] << " " << 
             q[3] << " " <<  q[0] << " " << q[1] << " " << q[2] << " " << //WXYZ
             t.at<float>(0) << " " << t.at<float>(1) << " " << t.at<float>(2) << " " << 
