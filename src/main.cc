@@ -34,7 +34,7 @@
 #include "LoopClosing.h"
 #include "KeyFrameDatabase.h"
 #include "ORBVocabulary.h"
-
+#include "Optimizer.h"
 
 #include "Converter.h"
 
@@ -194,6 +194,10 @@ int main(int argc, char **argv)
     //--------------
     //  Export the Poses and the Features to a NVM file
     //--------------
+    //adjust the scene first via global BA
+    cout << "Starting GlobalBA! This can take some minutes. \n";
+    ORB_SLAM::Optimizer::GlobalBundleAdjustemnt(&World,20);
+
     cout << endl << "Saving NVM to ORB_SLAM.nvm" << endl;
     //See http://ccwu.me/vsfm/doc.html#nvm for details about the file structure
     string nvmStrFile = ros::package::getPath("ORB_SLAM")+"/"+"ORB_SLAM.nvm";
@@ -235,7 +239,7 @@ int main(int argc, char **argv)
         if(pKF->isBad())
             continue;
 
-        cv::Mat R = pKF->GetRotation().t();
+        cv::Mat R = pKF->GetRotation();//.t();
         vector<float> q = ORB_SLAM::Converter::toQuaternion(R);
         cv::Mat t = pKF->GetCameraCenter();
         kf_index[pKF->mnFrameId]=i;
@@ -247,6 +251,10 @@ int main(int argc, char **argv)
     //f<< "\n";
     using namespace ORB_SLAM;
     //2. Export the 3D feature observations
+    //<Number of 3D points> <List of points>
+    //<Point>  = <XYZ> <RGB> <number of measurements> <List of Measurements>
+    //<Measurement> = <Image index> <Feature Index> <xy>
+
     std::vector<MapPoint*> all_points=World.GetAllMapPoints();
     f << all_points.size() << "\n";
     for(size_t i=0, iend=all_points.size(); i<iend;i++)
@@ -258,8 +266,15 @@ int main(int argc, char **argv)
         "0 0 0 ";
         //now all the observations/measurements
         std::map<KeyFrame*,size_t> observations=pMP->GetObservations();
-        //num observations:
-        f << pMP->Observations() << " ";
+        //count good observations:
+        int num_good_observations=0;
+        for (std::map<KeyFrame*,size_t>::iterator ob_it=observations.begin(); ob_it!=observations.end(); ob_it++)
+        {
+            if (!(*ob_it).first->isBad())
+                num_good_observations+=1;
+        }
+
+        f << num_good_observations << " ";
         for (std::map<KeyFrame*,size_t>::iterator ob_it=observations.begin(); ob_it!=observations.end(); ob_it++)
         {
             //skip if the key frame is "bad"
