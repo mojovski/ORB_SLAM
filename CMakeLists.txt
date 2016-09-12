@@ -17,6 +17,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 find_package(OpenCV REQUIRED)
+MESSAGE(STATUS "USing OPENCV LIBS: \n${OpenCV_LIBS}")
 find_package(Eigen3 REQUIRED)
 find_package(Cholmod REQUIRED)
 

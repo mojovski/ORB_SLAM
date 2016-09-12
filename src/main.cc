@@ -260,9 +260,19 @@ int main(int argc, char **argv)
     //<Measurement> = <Image index> <Feature Index> <xy>
 
     std::vector<MapPoint*> all_points=World.GetAllMapPoints();
-    f << all_points.size() << "\n";
+    int count_good_map_points=0;
     for(size_t i=0, iend=all_points.size(); i<iend;i++)
     {
+        if (!(all_points[i]->isBad()))
+            count_good_map_points+=1;
+    }
+
+    f << count_good_map_points << "\n";
+    for(size_t i=0, iend=all_points.size(); i<iend;i++)
+    {
+        if (all_points[i]->isBad())
+            continue;
+
         MapPoint* pMP = all_points[i];
         cv::Mat pos=pMP->GetWorldPos();
         f << pos.at<float>(0) << " " << pos.at<float>(1) << " " << pos.at<float>(2) << " " <<
